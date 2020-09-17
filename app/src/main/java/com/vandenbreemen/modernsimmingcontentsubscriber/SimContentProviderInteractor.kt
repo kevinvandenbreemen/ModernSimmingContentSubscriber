@@ -24,7 +24,11 @@ class SimContentProviderInteractor(private val context: Context) {
     private val posts: MutableLiveData<List<PostView>> = MutableLiveData()
     val postsLiveDate: LiveData<List<PostView>> get() = posts
 
-    fun fetchGroupNames() {
+    /**
+     * @param   onCompletion    Optional completion callback.  It is recommended that you instead subscribe to the
+     * #groupNamesLiveData and call this method without argument.  However certain circumstances may make using coroutines impossible.
+     */
+    fun fetchGroupNames(onCompletion: ((groupNames: List<String>) -> Unit)? = null) {
         val url = "content://$AUTHORITY/groups/"
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -38,7 +42,9 @@ class SimContentProviderInteractor(private val context: Context) {
                         } while(cursor.moveToNext())
                     }
 
-                    this@SimContentProviderInteractor.groupNames.postValue(groupNames)
+                    onCompletion?.let { completion->completion(groupNames) }
+                        ?: this@SimContentProviderInteractor.groupNames.postValue(groupNames)
+
                 }
             }
 
