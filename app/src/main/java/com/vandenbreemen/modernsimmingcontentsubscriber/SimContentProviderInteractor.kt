@@ -51,11 +51,16 @@ class SimContentProviderInteractor(private val context: Context) {
         }
     }
 
-    fun fetchGroupPosts(groupName: String) {
+    fun fetchGroupPosts(groupName: String, postCount: Int) {
         val url = "content://$AUTHORITY/groups/$groupName/list"
+        val uri = Uri.parse(url).buildUpon()
+            .appendQueryParameter("count", postCount.toString())
+            .build()
+
+
         CoroutineScope(IO).launch {
             val result: MutableList<PostView> = mutableListOf()
-            context.contentResolver.query(Uri.parse(url), emptyArray(), null, null, null)?.use { cursor ->
+            context.contentResolver.query(uri, emptyArray(), null, null, null)?.use { cursor ->
                 if(cursor.moveToFirst()) {
                     do {
                         result.add(
@@ -64,7 +69,7 @@ class SimContentProviderInteractor(private val context: Context) {
                                 cursor.getString(cursor.getColumnIndex("title")),
                                 cursor.getString(cursor.getColumnIndex("url")),
                                 cursor.getString(cursor.getColumnIndex("content"))
-                        ))
+                            ))
 
                     } while (cursor.moveToNext())
                 }
