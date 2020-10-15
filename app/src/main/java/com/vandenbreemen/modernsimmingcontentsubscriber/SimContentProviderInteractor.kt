@@ -65,6 +65,7 @@ class SimContentProviderInteractor(private val context: Context) {
                     do {
                         result.add(
                             PostView(
+                                cursor.getInt(cursor.getColumnIndex("id")),
                                 cursor.getLong(cursor.getColumnIndex("postedDate")),
                                 cursor.getString(cursor.getColumnIndex("title")),
                                 cursor.getString(cursor.getColumnIndex("url")),
